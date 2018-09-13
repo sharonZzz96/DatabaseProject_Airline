@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>Top 5 Customers</title>
+		<script src='../static/Chart.min.js'></script>	
+		<style>
+			/****************** navigation bar ************************/
+			.navigation{
+    			list-style-type: none;
+    			margin: 0;
+    			padding: 0;
+    			overflow: hidden;
+    			background-color: #5d5d5d;
+    			font-family: Arial;
+			}
+
+			.navigation a{
+				display: inline-block;
+    			color: white;
+    			padding: 14px 16px;
+    			text-decoration: none;
+    			text-align: center;
+    			cursor: pointer;
+    			width:auto;
+			}
+
+			.navigation a:hover {background-color: #383838; }
+
+			/*********************** header *********************/
+    		h2 {
+    			font-family: Arial;
+    			text-align: left;
+    		}
+
+    		p{
+    			font-family:Arial;
+    			text-align:left;
+    		}
+    		/************************** Forms **************************/
+
+    		form {
+    			 background-color: #f2f2f2;
+				 padding: 5px 20px 5px 20px;
+				 border: 1px solid lightgrey;
+				 border-radius: 3px;
+				 font-size:12px;
+				 font-family: Arial;
+    		}
+
+    		input {
+				width: 100px;
+				padding: 6px;
+				border: 1px solid #ccc;
+				border-radius: 3px;
+			}
+
+    		.btn {
+    			background-color: #962d00;
+				color: white;
+				padding: 4px;
+				margin: 4px 10px;
+				border: none;
+				border-radius: 3px;
+				cursor: pointer;
+				font-size: 12px;
+				width: auto;
+    		}
+    		/************************** Tables **************************/
+    		table {
+    			font-family:Helvetica;
+			    border-collapse: collapse;
+			    font-size: 14px;
+			    width: 40%;
+    		}
+
+    		td, th {
+			    border: 1px solid #ddd;
+			    padding: 8px;
+			}
+
+    		thead {
+    			padding-top: 10px;
+			    padding-bottom: 10px;
+			    text-align: left;
+			    background-color: #5d5d5d;
+			    color: white;
+    		}
+
+    		tr: hover {background-color:  #ddd;}
+
+    		/*************************** Errors ***************************/
+    		.error{
+    			color:red;
+    			font-family: Courier;
+    		}
+
+		</style>
+	</head>
+
+	<body>
+
+		<div class="navigation">
+			<a href="/home_ba">My Home</a>
+			<a href="/search_ba">Search Flights</a>
+			<a href="/purchase_ticket_ba">Purchase Tickets</a>
+			<a href="/view_commission">My Commission</a>
+			<a style="background-color: #962d00;" >Top Customers</a>
+			<a href="/logout_ba" style="float:right;">{{email}} Logout</a>
+		</div>
+		<h2>Top 5 Customers</h2>
+
+		<p>Top 5 customers based on number of tickets:</p>
+		<table>
+			<thead>
+				<tr>
+					<th> Customer Email</th>
+					<th> # of Tickets </th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for line in post1 %}
+					<tr>
+						<td>{{line.customer_email}}</td>
+						<td>{{line.number_of_tickets}}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	
+		<p>Top 5 customers based on total commission:</p>			
+		<table>
+			<thead>
+				<tr>
+					<th> Customer Email</th>
+					<th> Total Commission </th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for line in post2 %}
+					<tr>
+						<td>{{line.customer_email}}</td>
+						<td>{{line.total_commission}}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+
+
+	    <label for = "chart1">
+	    Top Customers Based on # of Tickets<br/>
+	    	<canvas id="chart1" width="600" height="400"></canvas>
+	    </label><br/>
+	    <label for = "chart2">
+	    Top Customers Based on Total Commission<br/>
+			<canvas id="chart2" width="600" height="400"></canvas>
+		</label>
+	    <script>
+			//bar chart data
+			var barData1 = {
+				labels: [{% for item in post1 %}
+							"{{item.customer_email}}",
+							{% endfor %}],
+				datasets: [
+					{
+						fillColor: "rgba(151,187,205,0.2)",
+            			strokeColor: "rgba(151,187,205,1)",
+            			pointColor: "rgba(151,187,205,1)", 
+            			data:[{% for item in post1 %}
+            					{{item.number_of_tickets}},
+            					{% endfor %}]
+					}
+					]
+				}
+			var mychart1 = document.getElementById("chart1").getContext("2d");
+
+			steps = 5
+			max = 10
+
+			//draw bar chart
+			new Chart(mychart1).Bar(barData1, {
+			        scaleOverride: true,
+			        scaleSteps: steps,
+			        scaleStepWidth: Math.ceil(max / steps),
+			        scaleStartValue: 0,
+			        scaleShowVerticalLines: true,
+			        scaleShowGridLines : true,
+			        barShowStroke : true,
+			        scaleShowLabels: true
+			   });
+
+
+			var barData2 = {
+				labels: [{% for item in post2 %}
+							"{{item.customer_email}}",
+							{% endfor %}],
+				datasets: [
+					{
+						fillColor: "#d1d1d1",
+            			strokeColor: "#5d5d5d",
+            			pointColor: "#5d5d5d", 
+            			data:[{% for item in post2 %}
+            					{{item.total_commission}},
+            					{% endfor %}]
+					}
+					]
+				}
+			var mychart2 = document.getElementById("chart2").getContext("2d")
+
+			steps = 10
+			max = 2000
+
+			new Chart(mychart2).Bar(barData2, {
+			        scaleOverride: true,
+			        scaleSteps: steps,
+			        scaleStepWidth: Math.ceil(max / steps),
+			        scaleStartValue: 0,
+			        scaleShowVerticalLines: true,
+			        scaleShowGridLines : true,
+			        barShowStroke : true,
+			        scaleShowLabels: true
+				});
+		</script>
+	
+	</body>
+
+</html>

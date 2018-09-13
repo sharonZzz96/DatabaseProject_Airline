@@ -1,0 +1,319 @@
+%s indicates that data are requested from the user and server
+
+-View public info-
+1. search upcoming flights based on departure/arrival city/airport and date 
+(if date is empty, use today; if airport/city is empty, select all flights)
+SELECT airline_name, flight_num, departure_airport, departure_time, arrival_airport, arrival_time, price
+    FROM flight JOIN airport S ON S.airport_name = departure_airport JOIN airport T ON T.airport_name = arrival_airport
+    WHERE S.airport_city = IFNULL(%s, S.airport_city) AND T.airport_city = IFNULL(%s, T.airport_city)
+    AND departure_airport = IFNULL(%s, departure_airport) AND arrival_airport = IFNULL(%s, arrival_airport) 
+    AND status = %s AND DATE(departure_time) = %s
+
+2. check flight status based on flight number and arrival/departure date
+ (if date is empty, select all flights based on flight_num)
+SELECT airline_name, flight_num, departure_airport, departure_time, arrival_airport, arrival_time, status
+    FROM flight 
+    WHERE flight_num = %s AND DATE(departure_time) = IFNULL(%s, DATE(departure_time))
+    AND DATE(arrival_time) = IFNULL(%s, DATE(arrival_time))
+
+
+-Customer-
+1. login
+# check whether the user has registered before
+SELECT * FROM customer WHERE email = %s AND password = MD5(%s)
+
+2. register
+# check if the user already exists
+SELECT * FROM customer WHERE username = %s
+# if not exists, register
+INSERT INTO customer 
+    VALUES(%s, %s, MD5(%s), %s, %s, %s, %s, %s, %s, %s, %s, %s)
+
+3. view my flights: display all the upcoming flights of the customer starting from today 
+SELECT airline_name, flight_num, departure_airport, departure_time, arrival_airport, arrival_time, status 
+    FROM flight NATURAL JOIN ticket NATURAL JOIN purchases
+    WHERE customer_email = %s AND status = %s AND DATE(departure_time) >= %s
+    ORDER BY departure_time
+
+4. search for flights: search upcoming flights based on city, airport, date 
+(if city/airport is empty, select flights for all cities/airports; if date is empty, select the flight departing today)
+SELECT airline_name, flight_num, departure_airport, departure_time, arrival_airport, arrival_time, price
+    FROM flight JOIN airport S ON S.airport_name = departure_airport JOIN airport T ON T.airport_name = arrival_airport
+    WHERE S.airport_city = IFNULL(%s, S.airport_city) AND T.airport_city = IFNULL(%s, T.airport_city)
+    AND departure_airport = IFNULL(%s, departure_airport) AND arrival_airport = IFNULL(%s, arrival_airport) 
+    AND status = %s AND DATE(departure_time) = %s
+
+5. purchase tickets
+# check if upcoming flight exists
+SELECT * 
+    FROM flight 
+    WHERE airline_name = %s AND flight_num = %s AND status = %s
+# check if there are available seats
+SELECT COUNT(ticket_id) as sold
+    FROM ticket
+    WHERE airline_name = %s AND flight_num = %s
+SELECT seats 
+    FROM airplane NATURAL JOIN flight 
+    WHERE flight.airline_name = %s AND flight_num = %s
+# check if generated ticket id is unique
+SELECT * FROM ticket WHERE ticket_id = %s 
+# insert data into purchases and ticket
+INSERT INTO ticket
+     VALUES(%s, %s, %s)
+INSERT INTO purchases
+     VALUES(%s, %s, NULL, %s)
+
+6. track my spending: track total spending of the customer 
+- total spending in the selected date
+- month-wise spending in the selected date (bar chart)
+(if one of date_start and date_end missing:
+display default: total spending in the past year  
+display default: year-month spending in the past half year)
+# track total spending
+SELECT COALESCE(SUM(price),0) AS total_spending
+    FROM purchases NATURAL JOIN ticket NATURAL JOIN flight
+    WHERE customer_email = %s AND purchase_date BETWEEN %s AND %s
+# track monthly spending
+SELECT YEAR(purchase_date) AS year, MONTH(purchase_date) AS month, COALESCE(SUM(price),0) AS total_spending
+    FROM purchases NATURAL JOIN ticket NATURAL JOIN flight
+    WHERE customer_email = %s AND purchase_date BETWEEN %s AND %s 
+    GROUP BY year, month
+
+
+-Booking agent-
+1. login
+# check whether the booking agent exists
+SELECT * FROM booking_agent WHERE email = %s AND password = MD5(%s)
+
+2. register
+# check if the email or agent id already exists
+SELECT * FROM booking_agent WHERE email = %s OR booking_agent_id = %s
+# if not exists, register
+INSERT INTO booking_agent VALUES(%s, MD5(%s), %s)
+
+3. view my flights: display all the upcoming flights starting from today booked by the agent
+SELECT airline_name, flight_num, departure_airport, departure_time, arrival_airport, arrival_time, status, customer_email
+    FROM flight NATURAL JOIN ticket NATURAL JOIN purchases NATURAL JOIN booking_agent
+    WHERE booking_agent.email = %s AND status = %s AND DATE(departure_time) >= %s
+    ORDER BY departure_time
+
+4. search for flights: search upcoming flights based on city, airport, date 
+(if no data for city/airport, select flights for all cities/airports; if no data for date, use today)
+SELECT airline_name, flight_num, departure_airport, departure_time, arrival_airport, arrival_time, price
+    FROM flight JOIN airport S ON S.airport_name = departure_airport JOIN airport T ON T.airport_name = arrival_airport
+    WHERE S.airport_city = IFNULL(%s, S.airport_city) AND T.airport_city = IFNULL(%s, T.airport_city)
+    AND departure_airport = IFNULL(%s, departure_airport) AND arrival_airport = IFNULL(%s, arrival_airport) 
+    AND status = %s AND DATE(departure_time) = %s
+
+5. purchase tickets 
+# check if the customer exists:
+SELECT * 
+    FROM customer
+    WHERE email = %s
+# check if the upcoming flight exists:
+SELECT * 
+    FROM flight 
+    WHERE airline_name = %s AND flight_num = %s AND status = %s
+# check if the flight has available seats
+SELECT COUNT(ticket_id) as sold
+    FROM ticket
+    WHERE airline_name = %s AND flight_num = %s
+SELECT seats 
+    FROM airplane NATURAL JOIN flight 
+    WHERE flight.airline_name = %s AND flight_num = %s
+# check if generated ticket id is unique
+SELECT * FROM ticket WHERE ticket_id = %s
+# find booking_agent_id through email
+SELECT booking_agent_id 
+    FROM booking_agent
+    WHERE email = %s
+# insert data into purchases and ticket
+INSERT INTO ticket
+    VALUES(%s, %s, %s)
+INSERT INTO purchases
+    VALUES(%s, %s, %s, %s)
+
+6. view my commission: view commission received by the agent in the date range
+(if no data in date_end: use today; if no data in date_start: use past month)
+SELECT COALESCE(SUM(price)*0.1,0) AS total_commission, 
+    COALESCE(SUM(price)*0.1/COUNT(ticket_id),0) AS average_commission, COUNT(ticket_id) AS total_ticket
+    FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN booking_agent
+    WHERE booking_agent.email = %s AND purchase_date BETWEEN %s AND %s
+
+7. view top customers: display top 5 customers of the booking agent 
+# by number of ticket in the past half year
+SELECT customer_email, COUNT(ticket_id ) AS number_of_tickets
+    FROM purchases NATURAL JOIN ticket NATURAL JOIN booking_agent
+    WHERE booking_agent.email = %s AND purchase_date BETWEEN %s AND %s
+    GROUP BY customer_email
+    ORDER BY number_of_tickets DESC
+    LIMIT 5
+# by total commission in the past whole year
+SELECT customer_email, COALESCE(SUM(price)*0.1,0) AS total_commission 
+    FROM purchases NATURAL JOIN ticket NATURAL JOIN flight NATURAL JOIN booking_agent
+    WHERE booking_agent.email = %s AND purchase_date BETWEEN %s AND %s
+    GROUP BY customer_email
+    ORDER BY total_commission DESC
+    LIMIT 5
+
+
+- Airline staff-
+1. login
+# check if airline staff exists
+SELECT * FROM airline_staff WHERE username = %s and password = MD5(%s)
+
+2. register
+# check if the staff already exists,
+SELECT * FROM airline_staff WHERE username = %s
+# if not exists, register
+INSERT INTO airline_staff VALUES(%s, MD5(%s), %s, %s, %s, %s)
+
+3. view my flights: display the default setting: upcoming flight in the next 30 days of the particular airline
+# select the airline the staff works in
+SELECT airline_name FROM airline_staff WHERE username = %s 
+# select the upcoming flight
+SELECT airline_name, flight_num, departure_airport, departure_time, arrival_airport, arrival_time, status
+    FROM flight
+    WHERE airline_name = %s AND DATE(departure_time) BETWEEN %s AND %s AND status = %s
+
+4. view my flights: display the flight based on date, city, airport 
+(if missing date_start, use today; if missing date_end, use today+30 (default setting); if missing airport/city, select all flights in the date range)
+# select the airline the staff works in
+SELECT airline_name FROM airline_staff WHERE username = %s
+# select all flights based on input (if no input, use default date)
+SELECT airline_name, flight_num, departure_airport, departure_time, arrival_airport, arrival_time, status
+    FROM flight JOIN airport S ON S.airport_name = departure_airport JOIN airport T ON T.airport_name = arrival_airport
+    WHERE airline_name = %s AND S.airport_city = IFNULL(%s, S.airport_city) AND T.airport_city = IFNULL(%s, T.airport_city) 
+    AND departure_airport = IFNULL(%s, departure_airport) AND arrival_airport = IFNULL(%s, arrival_airport)
+    AND DATE(departure_time) BETWEEN %s AND %s 
+    ORDER BY departure_time
+
+5. view my flights: display the customer list of selected flight 
+# select the airline the staff works in
+SELECT airline_name FROM airline_staff WHERE username = %s
+# check if the airline has the input flight
+SELECT * FROM flight WHERE airline_name = %s AND flight_num = %s 
+# select the customer email of the flight
+SELECT customer_email
+    FROM purchases NATURAL JOIN ticket NATURAL JOIN flight
+    WHERE airline_name = %s AND flight_num = %s
+
+6. create new flights: create flight for the staff's own airline 
+# select the airline the staff works in
+SELECT airline_name FROM airline_staff WHERE username = %s
+# display default setting: upcoming flights in the next 30 days
+SELECT airline_name, flight_num, departure_airport, departure_time, arrival_airport, arrival_time, status
+    FROM flight
+    WHERE airline_name = %s AND DATE(departure_time) BETWEEN %s AND %s AND status = %s
+# check whether the flight already exists
+SELECT * FROM flight WHERE airline_name = %s AND flight_num = %s
+# check foreign key constraint for (airline_name, airplane_id) in airplane
+SELECT * FROM airplane WHERE airline_name = %s AND airplane_id = %s
+# check foreign key for departure_airport in airport
+SELECT * FROM airport WHERE airport_name = %s
+# check foreign key for arrival_airport in airport
+SELECT * FROM airport WHERE airport_name = %s
+# create the flight
+INSERT INTO flight 
+    VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)
+
+7. change status of flights: change flight status for the particular airline
+# select the airline the staff works in
+SELECT airline_name FROM airline_staff WHERE username = %s
+# check if the flight exist
+SELECT * FROM flight WHERE airline_name = %s AND flight_num = %s
+# update flight status
+UPDATE flight
+    SET status = %s
+    WHERE flight_num = %s AND airline_name = %s
+
+8. add airplane in the system: add airplane for the particular airline
+# select the airline the staff works in
+SELECT airline_name FROM airline_staff WHERE username = %s
+# check if the plane exists for the airline
+SELECT * FROM airplane WHERE airline_name = %s AND airplane_id = %s
+# add plane for the airline
+INSERT INTO airplane
+    VALUES(%s, %s, %s)
+# display all planes of the airline
+SELECT airplane_id, seats 
+        FROM airplane 
+        WHERE airline_name = %s
+
+9. add new airport in the system
+# check if airport exists
+SELECT * FROM airport WHERE airport_name = %s AND airport_city = %s
+# add airport
+INSERT INTO airport
+    VALUES(%s, %s)
+
+10. view all booking agents: display the top 5 booking agent of this particular airline
+# select the airline the staff works in
+SELECT airline_name FROM airline_staff WHERE username = %s
+# top 5 agents based on number of tickets sales for the past month/year
+SELECT booking_agent_id, COUNT(ticket_id) AS total_tickets
+    FROM purchases NATURAL JOIN ticket
+    WHERE purchase_date >= %s AND booking_agent_id > 0 AND airline_name = %s
+    GROUP BY booking_agent_id
+    ORDER BY total_tickets DESC
+    LIMIT 5
+# top 5 booking agents based on the amount of commission received for the last year
+SELECT booking_agent_id, COALESCE(SUM(price)*0.1, 0) AS total_commission
+    FROM purchases NATURAL JOIN ticket NATURAL JOIN flight
+    WHERE purchase_date >= %s AND booking_agent_id > 0 AND ticket.airline_name = %s
+    GROUP BY booking_agent_id
+    ORDER BY total_commission DESC
+    LIMIT 5
+
+11. view frequent customers: display most frequent customers of the airline in the past year (allowing more than one most frequent customers)
+CREATE VIEW customer_ticket AS
+    (SELECT customer_email, COUNT(ticket_id) as times_of_flights
+    FROM purchases NATURAL JOIN ticket
+    WHERE purchase_date >= %s AND airline_name = %s
+    GROUP BY customer_email
+    ORDER BY times_of_flights)
+SELECT customer_email, times_of_flights
+    FROM customer_ticket 
+    WHERE times_of_flights = (SELECT MAX(times_of_flights) FROM customer_ticket)
+DROP VIEW customer_ticket
+
+12. view frequent customers: view flights (operated by the airline) already taken by a selected customer  
+# select the airline the staff works for
+SELECT airline_name FROM airline_staff WHERE username = %s 
+# select flight list of the customer
+SELECT flight_num
+    FROM flight NATURAL JOIN ticket NATURAL JOIN purchases
+    WHERE flight.airline_name = %s AND customer_email = %s AND DATE(departure_time) <= %s
+
+13. view reports: view ticket sold situation of the airline in the date range
+(if missing start_date, use last year; if missing end_date, use today)
+# total tickets sold
+SELECT COUNT(ticket_id) AS total_ticket_sold
+    FROM purchases NATURAL JOIN ticket 
+    WHERE purchase_date BETWEEN %s AND %s AND airline_name = %s
+# month wise tickets sold
+SELECT YEAR(purchase_date) AS year, MONTH(purchase_date) AS month, COUNT(ticket_id) AS ticket_sold
+    FROM purchases NATURAL JOIN ticket
+    WHERE purchase_date BETWEEN %s AND %s AND airline_name = %s
+    GROUP BY year, month
+
+14. comparison of revenue earned: compare revenue from customer purchase and agent purchase of the particular airline in the last month/year
+# select the airline the staff works in
+SELECT airline_name FROM airline_staff WHERE username = %s
+# direct purchase by customer
+SELECT COALESCE(SUM(price), 0) AS customer_purchase
+    FROM flight NATURAL JOIN ticket NATURAL JOIN purchases
+    WHERE booking_agent_id IS NULL AND purchase_date >= %s AND ticket.airline_name = %s
+# indirect purchase by agent
+SELECT COALESCE(SUM(price), 0) AS ba_purchase
+    FROM flight NATURAL JOIN ticket NATURAL JOIN purchases
+    WHERE booking_agent_id IS NOT NULL AND purchase_date >= %s AND ticket.airline_name = %s
+
+15. view top destinations: display top 3 flight destination of the particular airline in last year/3 months
+SELECT airport_city
+    FROM flight NATURAL JOIN ticket JOIN airport ON arrival_airport = airport_name
+    WHERE arrival_time BETWEEN %s AND %s AND ticket.airline_name = %s
+    GROUP BY airport_city
+    ORDER BY COUNT(ticket_id) DESC
+    LIMIT 3
+

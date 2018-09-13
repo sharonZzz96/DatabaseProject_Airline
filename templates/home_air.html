@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Home Page</title>
+		<style>
+			/****************** navigation bar ************************/
+			.navigation{
+    			list-style-type: none;
+    			margin: 0;
+    			padding: 0;
+    			overflow: hidden;
+    			background-color: #5d5d5d;
+    			font-family: Arial;
+			}
+			.navbtn, .dropbtn{
+				display: inline-block;
+    			color: white;
+    			padding: 14px 16px;
+    			text-decoration: none;
+    			text-align: center;
+    			cursor: pointer;
+    			width:auto;
+			}
+			/*.navbtn{
+				width:auto;
+				float:right;
+			}*/
+
+			/*.dropbtn{ 
+				width:70px;
+				background-color: #962d00;
+    		}*/
+
+			.navbtn:hover {background-color: #383838;}
+
+			.dropdown:hover .dropbtn{background-color: #383838; }
+
+			.dropdown{
+				float:left;
+				display: inline-block;
+			}
+
+			.dropdown-content{
+				display: none;
+			    position: absolute;
+			    background-color: #f9f9f9;
+			    min-width: 160px;
+			    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+			    z-index: 1;
+			}
+
+			.dropdown-content a{
+				color: black;
+			    padding: 12px 16px;
+			    text-decoration: none;
+			    display: block;
+			    text-align: left;
+			}
+
+			.dropdown-content a:hover {background-color: #f1f1f1}
+
+			.dropdown:hover .dropdown-content {display: block;}
+
+			/*********************** header *********************/
+    		h2 {
+    			font-family: Arial;
+    			text-align: left;
+    		}
+
+    		legend {
+    			font-family: Arial;
+    			font-weight: bold;
+    			color: #962d00;
+    			font-size: 20px;
+    		}
+
+    		fieldset {
+    			font-family: Arial;
+    		}
+    		/************************** Forms **************************/
+
+    		form {
+    			 background-color: #f2f2f2;
+				 padding: 5px 20px 5px 20px;
+				 border: 1px solid lightgrey;
+				 border-radius: 3px;
+				 font-size:12px;
+    		}
+
+    		input {
+				width: 100px;
+				padding: 6px;
+				border: 1px solid #ccc;
+				border-radius: 3px;
+			}
+
+    		.btn {
+    			background-color: #962d00;
+				color: white;
+				padding: 4px;
+				margin: 4px 15px;
+				border: none;
+				border-radius: 3px;
+				cursor: pointer;
+				font-size: 12px;
+				width: 50px;
+    		}
+
+    		/************************** Tables **************************/
+    		table {
+    			font-family:Helvetica;
+			    border-collapse: collapse;
+			    font-size: 14px;
+			    width: 100%;
+    		}
+
+    		td, th {
+			    border: 1px solid #ddd;
+			    padding: 8px;
+			}
+
+    		thead {
+    			padding-top: 10px;
+			    padding-bottom: 10px;
+			    text-align: left;
+			    background-color: #5d5d5d;
+			    color: white;
+    		}
+
+    		tr: hover {background-color:  #ddd;}
+
+    		/*************************** Errors ***************************/
+    		.error{
+    			color:red;
+    			font-family: Courier;
+    		}
+
+		</style>
+	</head>
+
+	<body>
+		<div class="navigation">
+			<a class="navbtn" style="float:left;background-color: #962d00;">My Home</a>
+			<div class="dropdown">
+				<a class="dropbtn">Menu </a>
+				<div class="dropdown-content">
+					<a href="/create_new_flight">Add Flight</a>
+					<a href="/add_plane">Add Airplane</a>
+					<a href="/add_airport"> Add Airport</a>
+					<a href="/change_status"> Change Flight Status</a>
+					<a href="/view_ba">Top Booking Agents</a>
+					<a href="/frequent_customer"> Top Customers</a>
+					<a href="/top_des"> Top Destinations</a>
+					<a href="/customer_list"> Customer Flights List</a>
+					<a href="/view_report"> Sales Report</a>
+					<a href="/compare_revenue"> Direct/Indirect Revenue</a>
+				</div>
+			</div>
+			<a href="/logout_air" class="navbtn" style="float:right;">{{email}} Logout</a>
+		</div><br>
+
+
+		<!-- 跳转链接check -->
+		<h2> Welcome, {{email}}</h2>
+
+		<fieldset>
+			<legend>Filter Your Flights (Default: Upcoming Flights in Next 30 Days）</legend>
+			<form action="/home_air" method="POST">
+				From: <input type="date" name="starting date" style="width:50px;"/>
+				To: <input type="date" name="ending date" style="width:50px;"/>
+				Source City: <input type="text" name="source city" style="width:60px;"/>
+				Destination City: <input type="text" name="destination city" style="width:60px;"/>
+				Source Airport: <input type="text" name="source airport" style="width:60px;" />
+				Destination Airport: <input type="text" name="destination airport" style="width:60px;" />
+				<input type="submit" value = "Filter" class="btn" />
+			</form>
+
+			{% if error %}
+			<p class="error"><strong>Error:</strong> {{error}}</p>
+			{% else %}
+				<table>
+					<thead>
+						<tr>
+							<th>Airline</th>
+							<th>Flight #</th>
+							<th>Departure Airport</th>
+							<th>Arrival Airport</th>
+							<th>Departure Time</th>
+							<th>Arrival Time</th>
+							<th>Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for line in posts %}
+							<tr>
+								<!-- tuple的话是这样吗还是要line['flight_num'] -->
+								<td>{{line.airline_name}}</td>
+								<td>{{line.flight_num}}</td>
+								<td>{{line.departure_airport}}</td>
+								<td>{{line.arrival_airport}}</td>
+								<td>{{line.departure_time}}</td>
+								<td>{{line.arrival_time}}</td>
+								<td>{{line.status}}</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			{% endif %}
+
+		</fieldset><br>
+
+		<fieldset>
+			<legend>Check Customer List</legend>
+			<form action="/cus_list" method="POST">
+				Flight Number: <input type="number" name="flight number" required="" />
+				<input type="submit" value = Submit class="btn" />
+			</form>
+
+			<table style="width: 40%">
+				<thead>
+					<tr>
+						<th>Customer Email</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for line in posts %}
+						<tr>
+							<td>{{line.customer_email}}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</fieldset>
+		
+	</body>
+</html>

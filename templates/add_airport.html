@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Add Airport</title>
+		<style>
+			/****************** navigation bar ************************/
+			.navigation{
+    			list-style-type: none;
+    			margin: 0;
+    			padding: 0;
+    			overflow: hidden;
+    			background-color: #5d5d5d;
+    			font-family: Arial;
+			}
+			.navbtn, .dropbtn{
+				display: inline-block;
+    			color: white;
+    			padding: 14px 16px;
+    			text-decoration: none;
+    			text-align: center;
+    			cursor: pointer;
+    			width:auto;
+			}
+
+			.navbtn:hover {background-color: #383838;}
+
+			.dropdown:hover .dropbtn{background-color: #383838; }
+
+			.dropdown{
+				float:left;
+				display: inline-block;
+			}
+
+			.dropdown-content{
+				display: none;
+			    position: absolute;
+			    background-color: #f9f9f9;
+			    min-width: 160px;
+			    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+			    z-index: 1;
+			}
+
+			.dropdown-content a{
+				color: black;
+			    padding: 12px 16px;
+			    text-decoration: none;
+			    display: block;
+			    text-align: left;
+			}
+
+			.dropdown-content a:hover {background-color: #f1f1f1}
+
+			.dropdown:hover .dropdown-content {display: block;}
+			/*********************** header *********************/
+    		h2{
+    			font-family: Arial;
+    			text-align: center;
+    		}
+    		/*************************** Forms *****************************/
+	    	form {
+	    		background-color: #f2f2f2;
+				padding: 20px 20px 20px 20px;
+				margin: auto;
+				width: 330px;
+				border: none;
+				font-family: Arial;
+				border-radius: 5px;
+	    	}
+
+	    	label{
+	    		font-size: 15px;
+	    		font-weight: bold;
+	    		margin-left: 30px;
+	    		width: 100px;
+	    	}
+
+	    	input {
+				width: 150px;
+				padding: 7px;
+				margin: 5px auto;
+				border: 1px solid #ccc;
+				border-radius: 3px;
+				font-size: 12px;
+			}
+
+	    	.btn {
+	    		background-color: #962d00;
+				color: white;
+				padding: 10px 20px;
+				margin: 15px 30px;
+				border: none;
+				border-radius: 3px;
+				cursor: pointer;
+				font-size: 16px;
+				width: 250px;
+	    	}
+
+	    	/*************************** Errors ***************************/
+    		.error{
+    			text-align: center;
+    			color:red;
+    			font-family: Courier;
+    		}
+
+    		.message{
+    			text-align: center;
+    			font-family: Courier;
+    			font-weight: bold;
+    		}
+    	</style>
+	</head>
+
+	<body>
+		<div class="navigation">
+<!-- 			<a class="navbtn" style="float:left;">My Home</a> -->
+			<a href="/home_air" class='navbtn' style="float:left;">My Home</a>
+			<div class="dropdown">
+				<a class="dropbtn">Menu </a>
+				<div class="dropdown-content">
+					<a href="/create_new_flight">Add Flight</a>
+					<a href="/add_plane">Add Airplane</a>
+					<a href="/add_airport"> Add Airport</a>
+					<a href="/change_status"> Change Flight Status</a>
+					<a href="/view_ba">Top Booking Agents</a>
+					<a href="/frequent_customer"> Top Customers</a>
+					<a href="/top_des"> Top Destinations</a>
+					<a href="/customer_list"> Customer Flights List</a>
+					<a href="/view_report"> Sales Report</a>
+					<a href="/compare_revenue"> Direct/Indirect Revenue</a>
+				</div>
+			</div>
+			<a href="/logout_air" class="navbtn" style="float:right;">{{email}} Logout</a>
+		</div>
+
+		<h2>Add Airport</h2>
+
+		<form action="/add_airport" method="POST">
+			<label>Airport Name: </label><input type="text" name="airport name" required /><br>
+			<label>Airport City: </label><input type="text" name="airport city" required /><br>
+			<input type="submit" value=Submit class="btn">
+		</form>
+
+		{% if msg %}
+			<p class="message">{{msg}}</p>
+		{% endif %}
+
+		{% if error %}
+			<p class="error"><strong>Error:</strong> {{error}}</p>
+		{% endif %}
+	</body>
+	
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>My Home</title>
+	</head>
+	<style>
+			/****************** navigation bar ************************/
+			.navigation{
+    			list-style-type: none;
+    			margin: 0;
+    			padding: 0;
+    			overflow: hidden;
+    			background-color: #5d5d5d;
+    			font-family: Arial;
+			}
+			.navbtn, .dropbtn{
+				display: inline-block;
+    			color: white;
+    			padding: 14px 16px;
+    			text-decoration: none;
+    			text-align: center;
+    			cursor: pointer;
+			}
+			.navbtn{
+				width:auto;
+				float:right;
+			}
+
+			.dropbtn{ 
+				width:70px;
+				background-color: #962d00;
+    		}
+
+			.navbtn:hover {background-color: #383838;}
+
+			.dropdown:hover .dropbtn{background-color: #511800; }
+
+			.dropdown{
+				float:left;
+				display: inline-block;
+			}
+
+			.dropdown-content{
+				display: none;
+			    position: absolute;
+			    background-color: #f9f9f9;
+			    min-width: 160px;
+			    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+			    z-index: 1;
+			}
+
+			.dropdown-content a{
+				color: black;
+			    padding: 12px 16px;
+			    text-decoration: none;
+			    display: block;
+			    text-align: left;
+			}
+
+			.dropdown-content a:hover {background-color: #f1f1f1}
+
+			.dropdown:hover .dropdown-content {display: block;}
+
+
+
+    		/*********************** header *********************/
+    		h2 {
+    			font-family: Arial;
+    			text-align: left;
+    		}
+
+    		p{
+    			font-family: Arial;
+    			font-size:15px;
+    		}
+
+    		/************************** Tables **************************/
+    		table {
+    			font-family:Helvetica;
+			    border-collapse: collapse;
+			    font-size: 14px;
+			    width: 100%;
+    		}
+
+    		td, th {
+			    border: 1px solid #ddd;
+			    padding: 8px;
+			}
+
+    		thead {
+    			padding-top: 10px;
+			    padding-bottom: 10px;
+			    text-align: left;
+			    background-color: #5d5d5d;
+			    color: white;
+    		}
+
+    		tr: hover {background-color:  #ddd;}
+
+		</style>
+	<body>
+
+		<div class="navigation">
+			<a href="/logout_ba" class="navbtn">{{email}} Logout</a>
+			<div class="dropdown">
+				<a class="dropbtn"> My Home </a>
+				<div class="dropdown-content">
+					<a href="/search_ba">Search Flights</a>
+					<a href="/purchase_ticket_ba">Purchase Ticket</a>
+					<a href="/view_commission">View My Commission</a>
+					<a href="/view_top_cus">Top Customers</a>
+				</div>
+			</div>
+		</div>
+		
+
+		<h2>Welcome, {{email}}. <br>Check your upcoming flights:</h2>
+		{% if posts%}
+		<table>
+			<thead>
+				<tr>
+					<th>Airline</th>
+					<th>Flight #</th>
+					<th>Departure Airport</th>
+					<th>Arrival Airport</th>
+					<th>Departure Time</th>
+					<th>Arrival Time</th>
+					<th>Status</th>
+					<th>Customer Email</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for line in posts %}
+					<tr>
+						<td>{{line.airline_name}}</td>
+						<td>{{line.flight_num}}</td>
+						<td>{{line.departure_airport}}</td>
+						<td>{{line.arrival_airport}}</td>
+						<td>{{line.departure_time}}</td>
+						<td>{{line.arrival_time}}</td>
+						<td>{{line.status}}</td>
+						<td>{{line.customer_email}}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+		{% else %}
+			<p>You have no upcoming flights.</p>
+		{% endif %}
+
+	</body>
+</html>

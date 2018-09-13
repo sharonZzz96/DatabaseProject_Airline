@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Purchase Tickets</title>
+	<style>
+			/****************** navigation bar ************************/
+			.navigation{
+    			list-style-type: none;
+    			margin: 0;
+    			padding: 0;
+    			overflow: hidden;
+    			background-color: #5d5d5d;
+    			font-family: Arial;
+			}
+
+			.navigation a{
+				display: inline-block;
+    			color: white;
+    			padding: 14px 16px;
+    			text-decoration: none;
+    			text-align: center;
+    			cursor: pointer;
+    			width:auto;
+			}
+
+			.navigation a:hover {background-color: #383838; }
+
+			/*********************** header *********************/
+    		h2 {
+    			font-family: Arial;
+    			text-align: left;
+    		}
+    		/************************** Forms **************************/
+
+    		form {
+    			 background-color: #f2f2f2;
+				 padding: 5px 20px 5px 20px;
+				 border: 1px solid lightgrey;
+				 border-radius: 3px;
+				 font-size:12px;
+				 font-family: Arial;
+    		}
+
+    		input {
+				width: 100px;
+				padding: 6px;
+				border: 1px solid #ccc;
+				border-radius: 3px;
+			}
+
+    		.btn {
+    			background-color: #962d00;
+				color: white;
+				padding: 4px;
+				margin: 4px 10px;
+				border: none;
+				border-radius: 3px;
+				cursor: pointer;
+				font-size: 12px;
+				width: 65px;
+    		}
+
+    		/************************** Tables **************************/
+    		table {
+    			font-family:Helvetica;
+			    border-collapse: collapse;
+			    font-size: 14px;
+			    width: 100%;
+    		}
+
+    		td, th {
+			    border: 1px solid #ddd;
+			    padding: 8px;
+			}
+
+    		thead {
+    			padding-top: 10px;
+			    padding-bottom: 10px;
+			    text-align: left;
+			    background-color: #5d5d5d;
+			    color: white;
+    		}
+
+    		tr: hover {background-color:  #ddd;}
+
+    		/*************************** Errors ***************************/
+    		.error{
+    			color:red;
+    			font-family: Courier;
+    		}
+
+    		.msg{
+    			font-family: Arial;
+    			font-weight: bold;
+    		}
+
+
+		</style>
+</head>
+<body>
+	<div class="navigation">
+			<a href="/home_cus">Home</a>
+			<a href="/search_flight_cus">Search Flights</a>
+			<a style="background-color: #962d00;"> Purchase Tickets</a>
+			<a href="/track_spending_cus">Track My Spending</a>
+			<a href="/logout_cus" style="float:right;">{{email}} Logout</a>
+	</div>
+	<h2>Purchase Tickets</h2>
+
+	{% if posts %}
+		<p class="msg">{{posts}}</br></p>
+	{% else %}
+		<form action="/purchase_ticket_cus" method="POST">
+	        Airline: <input type="text" name="airline name" required/>
+	        Flight Number: <input type="number" name="flight number" max=2147483647 required/>
+	        <input type="submit" value="Purchase" class="btn">
+	    </form>
+		{% if error %}
+			<p class="error">{{error}}</br></p>
+		{% endif %}
+	{% endif %}
+
+</body>

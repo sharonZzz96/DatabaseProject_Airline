@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Registration Page</title>
+	<style>
+		/****************** navigation bar ************************/
+			.navigation{
+	    			list-style-type: none;
+	    			margin: 0;
+	    			padding: 0;
+	    			overflow: hidden;
+	    			background-color: #5d5d5d;
+	    			font-family: Arial;
+			}
+			.navigation a {
+				display: inline-block;
+    			color: white;
+    			text-align: center;
+    			padding: 14px 16px;
+    			text-decoration: none;
+    			cursor: pointer;
+			}
+
+			.navigation a:hover {
+				background-color: #383838;
+			}
+
+    	/*************************** header ****************************/
+			h2 {
+    			font-family: Arial;
+    			text-align: center;
+    		}
+
+    		/*************************** Forms *****************************/
+	    	form {
+	    		background-color: #f2f2f2;
+				padding: 20px 20px 20px 20px;
+				margin: auto;
+				width: 330px;
+				border: none;
+				font-family: Arial;
+				border-radius: 5px;
+	    	}
+
+	    	label{
+	    		font-size: 15px;
+	    		font-weight: bold;
+	    		margin-left: 30px;
+	    		width: 100px;
+	    	}
+
+	    	input {
+				width: 150px;
+				padding: 7px;
+				margin: 5px auto;
+				border: 1px solid #ccc;
+				border-radius: 3px;
+				font-size: 12px;
+			}
+
+	    	.btn {
+	    		background-color: #962d00;
+				color: white;
+				padding: 10px 20px;
+				margin: 15px 30px;
+				border: none;
+				border-radius: 3px;
+				cursor: pointer;
+				font-size: 16px;
+				width: 250px;
+	    	}
+
+	    	/*************************** Errors ***************************/
+    		.error{
+    			color:red;
+    			font-family: Courier;
+    		}
+
+    </style>
+</head>
+<body>
+
+	<div class="navigation">
+			<a href="/">Back</a>
+			<a href="/login_air" style="float:right;">Login</a>
+	</div>
+
+	<h2>Registration Page</h2>
+
+	<form action="/registerAuth_air" method="POST">
+		
+		<label>Username: </label><input type="text" name="email" placeholder="email" required/><br>
+		<label>Password: </label><input type="password" name="password" placeholder="password" required/><br>
+		<label>First name: </label><input type="text" name="first name" placeholder="first name" required><br>
+		<label>Last name:  </label><input type="text" name="last name" placeholder="last name" required><br>
+		<label>Date of birth: </label><input type="date" name="date of birth" required/><br>
+		<label>Airline name: </label> <input type="text" name="airline name" placeholder="airline name" required><br>
+
+		<input type="submit" value = Register class="btn"/>
+		{% if error %}
+			<p class="error"><strong>Error:</strong> {{error}}</p>
+		{% endif %}
+	</form>
+
+</body>
+</html>

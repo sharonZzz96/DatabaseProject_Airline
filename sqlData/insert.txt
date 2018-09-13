@@ -1,0 +1,64 @@
+insert into airline
+	values ('China Eastern'), ('Spirit'), ('Delta')
+
+
+insert into airline_staff
+	values ('yz2113@nyu.edu', MD5('zhanghaha'), 'Sharon', 'Zhang', '1996-01-27', 'China Eastern'), ('zd415@nyu.edu', MD5('dinghaha'), 'Carol', 'Ding', '1995-09-09', 'Spirit'), ('dinghaha@nyu.edu', MD5('dinghaha'), 'Zhengyuan', 'Ding', '1990-12-31', 'Delta')
+
+
+insert into airplane
+	values ('China Eastern', 198, 10), ('Spirit', 440, 3), ('Delta', 339, 50), ('Delta', 222, 20), ('Delta', 666, 5)
+
+
+insert into airport
+	values ('JFK', 'NYC'), ('PVG', 'Shanghai'), ('BCIA', 'Beijing'), ('ORD', 'Chicago')
+
+
+insert into booking_agent
+	values ('chunqiu@gmail.com', MD5('chunqiuhaha'), 12345), ('dongfang@gmail.com', MD5('dongfanghaha'), 01350), ('nyu@gmail.com', MD5('nyuhaha'), 0019), ('nw@gmail.com', MD5('nwhaha'), 33608), ('cmu@gmail.com', MD5('cmuhaha'), 9960), ('cu@gmail.com', MD5('cuhaha'), 8222), ('gatech@gmail.com', MD5('gatechhaha'), 0029)
+
+
+insert into customer
+	values ('sallyzhang@gmail.com', 'Sally', MD5('sallyhaha'), '2', 'Century Avenue', 'Shanghai', 'Shanghai', 1387402, 'E139704', '2020-12-17', 'China', '1996-06-08'), 
+	('fanny@nyu.edu', 'Fanny', MD5('fannyhaha'), '14B', 'Lafayette Street', 'New York', 'NY', 917496, 'EABC400', '2023-01-23', 'U.S.', '1993-01-07'),
+	('jane@nyu.edu', 'Jane', MD5('janehaha'), '3b', 'Caoyang Road', 'Beijing', 'Beijing', 99637, 'Q19967', '2022-02-02', 'China', '1990-09-08'),
+	('nancy@nyu.edu', 'Nancy', MD5('nancyhaha'), '20', 'Yangzi Road', 'Shanghai', 'Shanghai', 1234509, 'C198', '2030-01-20',' China', '1988-12-30')
+
+
+insert into flight
+	values ('China Eastern', 9098, 'JFK', '2018-05-20 11:45:00', 'PVG', '2018-05-21 12:00:00', 5000, 'upcoming', 198), 
+	('Spirit', 119, 'PVG', '2018-05-25 19:40:00', 'JFK', '2018-05-25 03:25:00', 1800, 'upcoming', 440), 
+	('Delta', 188, 'ORD', '2018-06-02 12:00:00', 'JFK', '2018-06-02 15:30:00', 3200, 'upcoming', 222), ('Delta', 320, 'ORD', '2018-01-01 03:40:04', 'PVG', '2018-01-02 09:00;00', 4500, 'in progress', 339), ('Delta', 999, 'BCIA', '2017-03-29 04:00:00', 'PVG', '2017-03-29 06:00:00', 2000, 'in progress', 339), ('Delta', 380, 'BCIA', '2018-03-10 03:00:00', 'ORD', '2018-03-10 19:00:00', 8000, 'in progress', 666)
+
+
+insert into ticket
+	values (111111, 'China Eastern', 9098), 
+	(111112, 'China Eastern', 9098), 
+	(22222, 'Spirit', 119), 
+	(222223, 'Spirit', 119), 
+	(00001, 'Delta', 320), 
+	(00002, 'Delta', 320), 
+	(00003, 'Delta', 320), 
+	(30000, 'Delta', 999), 
+	(300001, 'Delta', 999), 
+	(300002, 'Delta', 999), 
+	(40001, 'Delta', 188), 
+	(400003, 'Delta', 380), 
+	(502, 'Delta', 380)
+
+
+insert into purchases
+	 values (111111, 'sallyzhang@gmail.com', null, '2018-03-07' ), 
+	 (111112, 'sallyzhang@gmail.com', 12345, '2018-03-09' ), 
+	 (22222, 'fanny@nyu.edu', 01350, '2018-04-30'), 
+	 (222223, 'jane@nyu.edu', 01350, '2018-04-20'), 
+	 (00001, 'jane@nyu.edu', null, '2017-12-30'), 
+	 (00002, 'fanny@nyu.edu', 01350, '2017-04-29'), 
+	 (00003, 'sallyzhang@gmail.com', 0019, '2017-12-19'), 
+	 (30000, 'sallyzhang@gmail.com', 33608, '2017-03-01'), 
+	 (300001, 'fanny@nyu.edu', 8222, '2017-02-20'), 
+	 (300002, 'jane@nyu.edu', 8222, '2017-02-10'), 
+	 (40001, 'fanny@nyu.edu', null, '2018-4-30'),
+	 (400003, 'nancy@nyu.edu', 0029, '2018-02-10'), 
+	 (502, 'fanny@nyu.edu', 9960, '2018-01-01')
+

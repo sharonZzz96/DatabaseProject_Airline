@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Registration Page</title>
+	<style>
+	/****************** navigation bar ************************/
+			.navigation{
+	    			list-style-type: none;
+	    			margin: 0;
+	    			padding: 0;
+	    			overflow: hidden;
+	    			background-color: #5d5d5d;
+	    			font-family: Arial;
+			}
+			.navigation a {
+				display: inline-block;
+    			color: white;
+    			text-align: center;
+    			padding: 14px 16px;
+    			text-decoration: none;
+    			cursor: pointer;
+			}
+
+			.navigation a:hover {
+				background-color: #383838;
+			}
+		/*************************** header ****************************/
+			h2 {
+    			font-family: Arial;
+    			text-align: center;
+    		}
+
+    	/*************************** Forms *****************************/
+	    	form {
+	    		background-color: #f2f2f2;
+				padding: 20px 20px 20px 20px;
+				margin: auto;
+				width: 300px;
+				border: none;
+				font-family: Arial;
+				border-radius: 5px;
+	    	}
+
+	    	label{
+	    		font-size: 16px;
+	    		font-weight: bold;
+	    		margin:30px;
+	    	}
+
+	    	input {
+				width: 200px;
+				padding: 10px;
+				margin: 9px 30px;
+				border: 1px solid #ccc;
+				border-radius: 3px;
+				font-size: 13px;
+			}
+
+	    	.btn {
+	    		background-color: #962d00;
+				color: white;
+				padding: 10px 20px;
+				margin: 8px 30px;
+				border: none;
+				border-radius: 3px;
+				cursor: pointer;
+				font-size: 16px;
+				width: 220px;
+	    	}
+
+	    	/*************************** Errors ***************************/
+    		.error{
+    			color:red;
+    			font-family: Courier;
+    		}
+	</style>
+</head>
+<body>
+
+	<div class="navigation">
+			<a href="/">Back</a>
+			<a href="/login_ba" style="float:right;">Login</a>
+	</div>
+
+	<h2>Registration Page</h2>
+
+	<form action="/registerAuth_ba" method="POST">
+		
+		<label>Username: </label><br><input type="text" name="email" placeholder="email" required/><br>
+		<label>Password: </label><br><input type="password" name="password" placeholder="password" required/><br>
+		<label>Booking Agent ID: </label><br><input type="number" name="booking agent id" placeholder="ID" max=2147483647 required></br>
+
+		<input type="submit" value = "Register" class="btn"/>
+		{% if error %}
+			<p class="error"><strong>Error:</strong> {{error}}</p>
+		{% endif %}
+
+	</form>
+
+	
+</body>
+</html>
